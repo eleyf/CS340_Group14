@@ -116,9 +116,57 @@ def songSearch():
     print(result)
     return render_template('songSearch.html', rows=result)
 
-@webapp.route('/songAdd.html')
+@webapp.route('/songAdd.html', methods=['GET', 'POST'])
 def songAdd():
-    return render_template('songAdd.html')
+    if request.method == 'GET':
+        return render_template('songAdd.html')
+    elif request.method == 'POST':
+        db_connection = connect_to_database()
+        errors = []
+
+        # extract data from form
+        song_name = request.form['songName']
+        album_name = request.form['albumName']
+        artist_name = request.form['artistName']
+
+        # get the album id given the album name
+        data = (album_name,)
+        query = 'SELECT `album`.`id` FROM `album` WHERE `album`.`name` = %s;'
+        result = execute_query(db_connection, query, data).fetchall()
+
+        try:
+            album_id = result[0][0]
+        except IndexError:
+            errors.append('Invalid album')
+
+        # get the artist id given the artist name
+        data = (artist_name,)
+        query = 'SELECT `artist`.`id` FROM `artist` WHERE `artist`.`name` = %s;'
+        result = execute_query(db_connection, query, data).fetchall()
+
+        try:
+            artist_id = result[0][0]
+        except IndexError:
+            errors.append('Invalid artist')
+
+        if errors:
+            return render_template('songAdd.html', errors=errors)
+
+        # insert data
+        query = ('INSERT INTO `song` (`id`, `name`, `album_id`) '
+                 'VALUES (NULL, %s, %s);')
+        data = (song_name, album_id)
+        execute_query(db_connection, query, data)
+
+        query = ('INSERT INTO `song_artist` (`song_id`, `artist_id`) '
+                 'VALUES (LAST_INSERT_ID(), %s);')
+        data = (artist_id,)
+        execute_query(db_connection, query, data)
+
+        # display search page
+        query = 'SELECT `song`.`id`, `song`.`name` AS `song_name`, `album`.`name` AS `album_name`, `artist`.`name` AS `artist_name` FROM `song`JOIN `album` on `song`.`album_id` = `album`.`id`JOIN `song_artist` on `song`.`id` = `song_artist`.`song_id`JOIN `artist` ON `song_artist`.`artist_id` = `artist`.`id` ORDER BY song_name ASC;'
+        result = execute_query(db_connection, query).fetchall();
+        return render_template('songSearch.html', rows=result)
 
 @webapp.route('/songEdit.html')
 def songEdit():
@@ -133,9 +181,59 @@ def albumSearch():
     print(result)
     return render_template('albumSearch.html', rows=result)
 
-@webapp.route('/albumAdd.html')
+@webapp.route('/albumAdd.html', methods=['GET', 'POST'])
 def albumAdd():
-    return render_template('albumAdd.html')
+    if request.method == 'GET':
+        return render_template('albumAdd.html')
+    elif request.method == 'POST':
+        db_connection = connect_to_database()
+        errors = []
+
+        # extract data from form
+        album_name = request.form['albumName']
+        label_name = request.form['labelName']
+        release_date = request.form['releaseDate']
+        artist_name = request.form['artistName']
+
+        # get the label id given the label name
+        data = (label_name,)
+        query = 'SELECT `record_label`.`id` FROM `record_label` WHERE `record_label`.`name` = %s;'
+        result = execute_query(db_connection, query, data).fetchall()
+
+        try:
+            label_id = result[0][0]
+        except IndexError:
+            errors.append('Invalid label')
+
+        # get the artist id given the artist name
+        data = (artist_name,)
+        query = 'SELECT `artist`.`id` FROM `artist` WHERE `artist`.`name` = %s;'
+        result = execute_query(db_connection, query, data).fetchall()
+
+        try:
+            artist_id = result[0][0]
+        except IndexError:
+            errors.append('Invalid artist')
+
+        if errors:
+            return render_template('albumAdd.html', errors=errors)
+
+        # insert data
+        query = ('INSERT INTO `album` '
+                 '(`id`, `name`, `label_id`, `release_date`) '
+                 'VALUES (NULL, %s, %s, %s);')
+        data = (album_name, label_id, release_date)
+        result = execute_query(db_connection, query, data)
+
+        query = ('INSERT INTO `album_artist` (`album_id`, `artist_id`) '
+                 'VALUES (LAST_INSERT_ID(), %s);')
+        data = (artist_id,)
+        execute_query(db_connection, query, data)
+
+        # display search page
+        query = 'SELECT `album`.`id`, `album`.`name`, `record_label`.`name`, `album`.`release_date` FROM `album`JOIN `record_label` ON `album`.`label_id` = `record_label`.`id` ORDER BY `album`.`name` ASC;'
+        result = execute_query(db_connection, query).fetchall()
+        return render_template('albumSearch.html', rows=result)
 
 @webapp.route('/albumEdit.html')
 def albumEdit():
@@ -150,9 +248,26 @@ def artistSearch():
     print(result)
     return render_template('artistSearch.html', rows=result)
 
-@webapp.route('/artistAdd.html')
+@webapp.route('/artistAdd.html', methods=['GET', 'POST'])
 def artistAdd():
-    return render_template('artistAdd.html')
+    if request.method == 'GET':
+        return render_template('artistAdd.html')
+    elif request.method == 'POST':
+        db_connection = connect_to_database()
+
+        # extract data from form
+        artist_name = request.form['artistName']
+
+        # insert data
+        query = ('INSERT INTO `artist` (`id`, `name`) '
+                 'VALUES (NULL, %s);')
+        data = (artist_name,)
+        execute_query(db_connection, query, data)
+
+        # display search page
+        query = 'SELECT * FROM `artist` ORDER BY name ASC;'
+        result = execute_query(db_connection, query).fetchall()
+        return render_template('artistSearch.html', rows=result)
 
 @webapp.route('/artistEdit.html')
 def artistEdit():
@@ -167,9 +282,31 @@ def labelSearch():
     print(result)
     return render_template('labelSearch.html', rows=result)
 
-@webapp.route('/labelAdd.html')
+@webapp.route('/labelAdd.html', methods=['GET', 'POST'])
 def labelAdd():
-    return render_template('labelAdd.html')
+    if request.method == 'GET':
+        return render_template('labelAdd.html')
+    elif request.method == 'POST':
+        db_connection = connect_to_database()
+
+        # extract data from form
+        label_name = request.form['labelName']
+        street_address = request.form['streetAddress']
+        city = request.form['city']
+        state = request.form['state']
+        zip_code = request.form['zipCode']
+
+        # insert data
+        query = ('INSERT INTO `record_label` '
+                 '(`id`, `name`, `street_address`, `city`, `state`, `zip_code`) '
+                 'VALUES (NULL, %s, %s, %s, %s, %s);')
+        data = (label_name, street_address, city, state, zip_code)
+        execute_query(db_connection, query, data)
+
+        # display search page
+        query = 'SELECT * FROM `record_label` ORDER BY name ASC;'
+        result = execute_query(db_connection, query).fetchall()
+        return render_template('labelSearch.html', rows=result)
 
 @webapp.route('/labelEdit.html')
 def labelEdit():
