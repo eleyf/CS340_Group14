@@ -41,14 +41,6 @@ def add_new_people():
         execute_query(db_connection, query, data)
         return ('Person added!');
 
-@webapp.route('/')
-def index():
-    return render_template('index.html')
-
-@webapp.route('/index.html')
-def home():
-    return render_template('index.html')
-
 @webapp.route('/db-test')
 def test_database_connection():
     print("Executing a sample query on the database using the credentials from db_credentials.py")
@@ -100,14 +92,28 @@ def delete_people(id):
     result = execute_query(db_connection, query, data)
     return (str(result.rowcount) + "row deleted")
 
+
+# *************************************************************** #
+#
+#   apps for music database below
+#
+# *************************************************************** #
+
+@webapp.route('/')
+def index():
+    return render_template('index.html')
+
+@webapp.route('/index.html')
+def home():
+    return render_template('index.html')
+
 @webapp.route('/songSearch.html')
 def songSearch():
-    print("Fetching and rendering people web page")
+    print("Fetching and rendering song web page")
     db_connection = connect_to_database()
-    query = 'SELECT fname, lname, homeworld, age, character_id from bsg_people;'
+    query = 'SELECT `song`.`id`, `song`.`name` AS `song_name`, `album`.`name` AS `album_name`, `artist`.`name` AS `artist_name` FROM `song`JOIN `album` on `song`.`album_id` = `album`.`id`JOIN `song_artist` on `song`.`id` = `song_artist`.`song_id`JOIN `artist` ON `song_artist`.`artist_id` = `artist`.`id` ORDER BY song_name ASC;'
     result = execute_query(db_connection, query).fetchall();
     print(result)
-    # return render_template('people_browse.html', rows=result)
     return render_template('songSearch.html', rows=result)
 
 @webapp.route('/songAdd.html')
@@ -120,7 +126,12 @@ def songEdit():
 
 @webapp.route('/albumSearch.html')
 def albumSearch():
-    return render_template('albumSearch.html')
+    print("Fetching and rendering album web page")
+    db_connection = connect_to_database()
+    query = 'SELECT `album`.`id`, `album`.`name`, `record_label`.`name`, `album`.`release_date` FROM `album`JOIN `record_label` ON `album`.`label_id` = `record_label`.`id` ORDER BY `album`.`name` ASC;'
+    result = execute_query(db_connection, query).fetchall();
+    print(result)
+    return render_template('albumSearch.html', rows=result)
 
 @webapp.route('/albumAdd.html')
 def albumAdd():
@@ -149,7 +160,12 @@ def artistEdit():
 
 @webapp.route('/labelSearch.html')
 def labelSearch():
-    return render_template('labelSearch.html')
+    print("Fetching and rendering label web page")
+    db_connection = connect_to_database()
+    query = 'SELECT * FROM `record_label` ORDER BY name ASC;'
+    result = execute_query(db_connection, query).fetchall();
+    print(result)
+    return render_template('labelSearch.html', rows=result)
 
 @webapp.route('/labelAdd.html')
 def labelAdd():

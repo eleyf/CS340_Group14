@@ -67,45 +67,30 @@
             <table class="table table-striped">
                 <thead class="thead-dark">
                 <tr>
-                    <th scope="col">#</th>
                     <th scope="col">Name</th>
                     <th scope="col">Album</th>
                     <th scope="col">Artist</th>
                     <th scope="col">Actions</th>
                 </tr>
                 </thead>
+
                 <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Kiss</td>
-                    <td>Parade</td>
-                    <td>Prince</td>
-                    <td>
-                        <a href="songEdit.html" class="btn btn-info" style="margin-right: 15px">EDIT</a>
-                        <input type="button" value="DELETE" class="btn btn-danger">
+                  {% for r in rows %}
+                  <tr>
+
+                    <td> {{ r[1] }}</td>
+                    <td> {{ r[2] }}</td>
+                    <td> {{ r[3] }}</td>       
+                    <td> 
+                        <input type='button' name='Edit' value='EDIT' class="btn btn-info" style="margin-right: 15px"
+                        onclick="window.location = '/artistEdit.html'">
+
+                        <input type='button' name='Delete' value='DELETE' class="btn btn-danger">
                     </td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>This Love</td>
-                    <td>Songs About Jane</td>
-                    <td>Maroon 5</td>
-                    <td>
-                        <a href="songEdit.html" class="btn btn-info" style="margin-right: 15px">EDIT</a>
-                        <input type="button" value="DELETE" class="btn btn-danger">
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">3</th>
-                    <td>Get Lucky</td>
-                    <td>Random Access Memories</td>
-                    <td>Daft Punk</td>
-                    <td>
-                        <a href="songEdit.html" class="btn btn-info" style="margin-right: 15px">EDIT</a>
-                        <input type="button" value="DELETE" class="btn btn-danger">
-                    </td>
-                </tr>
+                  </tr>
+                  {% endfor %}
                 </tbody>
+
             </table>
 
         </div>

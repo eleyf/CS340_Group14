@@ -64,7 +64,6 @@
             <table class="table table-striped">
                 <thead class="thead-dark">
                 <tr>
-                    <th scope="col">#</th>
                     <th scope="col">Name</th>
                     <th scope="col">Street Address</th>
                     <th scope="col">City</th>
@@ -73,44 +72,26 @@
                     <th scope="col">Actions</th>
                 </tr>
                 </thead>
+
                 <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Warner Brothers</td>
-                    <td>111 Main St</td>
-                    <td>Los Angeles</td>
-                    <td>CA</td>
-                    <td>54321</td>
-                    <td>
-                        <a href="labelEdit.html" class="btn btn-info" style="margin-right: 15px">EDIT</a>
-                        <input type="button" value="DELETE" class="btn btn-danger">
+                  {% for r in rows %}
+                  <tr>
+
+                    <td> {{ r[1] }}</td>
+                    <td> {{ r[2] }}</td>
+                    <td> {{ r[3] }}</td> 
+                    <td> {{ r[4] }}</td>
+                    <td> {{ r[5] }}</td>       
+                    <td> 
+                        <input type='button' name='Edit' value='EDIT' class="btn btn-info" style="margin-right: 15px"
+                        onclick="window.location = '/artistEdit.html'">
+
+                        <input type='button' name='Delete' value='DELETE' class="btn btn-danger">
                     </td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Octone</td>
-                    <td>5050 6th Ave</td>
-                    <td>New York</td>
-                    <td>NY</td>
-                    <td>30303</td>
-                    <td>
-                        <a href="labelEdit.html" class="btn btn-info" style="margin-right: 15px">EDIT</a>
-                        <input type="button" value="DELETE" class="btn btn-danger">
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">3</th>
-                    <td>Columbia</td>
-                    <td>7000 N Clark St.</td>
-                    <td>Chicago</td>
-                    <td>IL</td>
-                    <td>05939</td>
-                    <td>
-                        <a href="labelEdit.html" class="btn btn-info" style="margin-right: 15px">EDIT</a>
-                        <input type="button" value="DELETE" class="btn btn-danger">
-                    </td>
-                </tr>
+                  </tr>
+                  {% endfor %}
                 </tbody>
+
             </table>
 
         </div>
