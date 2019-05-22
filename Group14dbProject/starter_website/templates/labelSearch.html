@@ -44,12 +44,12 @@
             <br>
             <br>
 
-            <form>
+            <form id="labelSearchForm" action="/labelSearch.html" method="post">
 
                 <div class="form-row">
                     <div class="form-group col-md-4">
-                        <input type="text" class="form-control" id="exampleLabelSearch"
-                               placeholder="Search for Recording Label">
+                        <input type="text" class="form-control" id="labelSearchId"
+                        name="labelToSearchFor" placeholder="Search for Label By Name">
                     </div>
 
                     <div>
@@ -64,6 +64,7 @@
             <table class="table table-striped">
                 <thead class="thead-dark">
                 <tr>
+                    <th hidden scope="col">Id</th>
                     <th scope="col">Name</th>
                     <th scope="col">Street Address</th>
                     <th scope="col">City</th>
@@ -77,6 +78,7 @@
                   {% for r in rows %}
                   <tr>
 
+                    <td hidden> {{ r[0] }}</td>
                     <td> {{ r[1] }}</td>
                     <td> {{ r[2] }}</td>
                     <td> {{ r[3] }}</td> 
@@ -84,7 +86,7 @@
                     <td> {{ r[5] }}</td>       
                     <td> 
                         <input type='button' name='Edit' value='EDIT' class="btn btn-info" style="margin-right: 15px"
-                        onclick="window.location = '/artistEdit.html'">
+                        onclick="window.location = '/labelEdit.html'">
 
                         <input type='button' name='Delete' value='DELETE' class="btn btn-danger">
                     </td>

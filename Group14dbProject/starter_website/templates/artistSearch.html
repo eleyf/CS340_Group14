@@ -44,12 +44,12 @@
             <br>
             <br>
 
-            <form>
+            <form id="artistSearchForm" action="/artistSearch.html" method="post">
 
                 <div class="form-row">
                     <div class="form-group col-md-4">
-                        <input type="text" class="form-control" id="exampleArtistSearch"
-                               placeholder="Search for Artist">
+                        <input type="text" class="form-control" id="artistSearchId"
+                        name="artistToSearchFor" placeholder="Search for Artist By Name">
                     </div>
 
                     <div>
@@ -64,7 +64,7 @@
             <table class="table table-striped">
                 <thead class="thead-dark">
                 <tr>
-<!--                     <th scope="col">#</th> -->
+                    <th hidden scope="col">Id</th>
                     <th scope="col">Artist</th>
                     <th scope="col">Actions</th>
                 </tr>
@@ -73,14 +73,9 @@
                 <tbody>
                   {% for r in rows %}
                   <tr>
-                    <!-- <td> {{ r.0 }}</td> -->
+
+                    <td hidden> {{ r[0] }}</td>
                     <td> {{ r[1] }}</td>
-
-
-<!--                     <td>
-                        <a href="artistEdit.html" class="btn btn-info" style="margin-right: 15px">EDIT</a>
-                        <input type="button" value="DELETE" class="btn btn-danger">
-                    </td> -->
 
                     <td> 
                         <input type='button' name='Edit' value='EDIT' class="btn btn-info" style="margin-right: 15px"
@@ -92,35 +87,6 @@
                   {% endfor %}
                 </tbody>
 
-
-
-
-<!--                 <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Prince</td>
-                    <td>
-                        <a href="artistEdit.html" class="btn btn-info" style="margin-right: 15px">EDIT</a>
-                        <input type="button" value="DELETE" class="btn btn-danger">
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Maroon 5</td>
-                    <td>
-                        <a href="artistEdit.html" class="btn btn-info" style="margin-right: 15px">EDIT</a>
-                        <input type="button" value="DELETE" class="btn btn-danger">
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">3</th>
-                    <td>Daft Punk</td>
-                    <td>
-                        <a href="artistEdit.html" class="btn btn-info" style="margin-right: 15px">EDIT</a>
-                        <input type="button" value="DELETE" class="btn btn-danger">
-                    </td>
-                </tr>
-                </tbody> -->
             </table>
 
         </div>
