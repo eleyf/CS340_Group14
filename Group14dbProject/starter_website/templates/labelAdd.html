@@ -41,36 +41,36 @@
             <div class="card col-sm-6">
                 <div class="card-body">
                     <h5 class="card-title" style="text-align: center">Add A Label</h5>
-                    <form>
+                    <form action="/labelAdd.html" method="POST">
 
                         <div class="form-group col-md-6">
                             <label for="labelNameId">Label Name</label>
                             <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="labelNameId"
-                                   placeholder="Name of Label">
+                                   placeholder="Name of Label" name="labelName">
                         </div>
 
                         <div class="form-group col-md-6">
                             <label for="streetAddressId">Album</label>
                             <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="streetAddressId"
-                                   placeholder="Street Address">
+                                   placeholder="Street Address" name="streetAddress">
                         </div>
 
                         <div class="form-group col-md-6">
                             <label for="cityId">City</label>
                             <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="cityId"
-                                   placeholder="City">
+                                   placeholder="City" name="city">
                         </div>
 
                         <div class="form-group col-md-6">
                             <label for="stateId">State</label>
                             <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="stateId"
-                                   placeholder="State">
+                                   placeholder="State" name="state">
                         </div>
 
                         <div class="form-group col-md-6">
                             <label for="zipCodeId">Zip Code</label>
                             <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="zipCodeId"
-                                   placeholder="Zip Code">
+                                   placeholder="Zip Code" name="zipCode">
                         </div>
 
                         <button type="submit" class="btn btn-primary" id="newLabelSubmitId">Add Label</button>
