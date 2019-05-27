@@ -285,12 +285,9 @@ def albumAdd():
         release_date = request.form['releaseDate']
         artist_name = request.form['artistName']
 
-        artist_keys = [s for s in request.form if 'artistName' in s]
-        artist_keys.pop()
-
         # get the label id given the label name
         data = (label_name,)
-        query = 'SELECT `record_label`.`id` FROM `record_label` WHERE `record_label`.`name` = %s'
+        query = 'SELECT `record_label`.`id` FROM `record_label` WHERE `record_label`.`name` = %s;'
 
         result = execute_query(db_connection, query, data).fetchall()
 
@@ -298,6 +295,9 @@ def albumAdd():
             label_id = result[0][0]
         except IndexError:
             errors.append('Invalid label')
+
+        artist_keys = [s for s in request.form if 'artistName' in s]
+        artist_keys.pop()
 
         # get the artist ids given the artist names
         data = tuple([request.form[s] for s in request.form if 'artistName' in s])
