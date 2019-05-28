@@ -41,36 +41,36 @@
             <div class="card col-sm-6">
                 <div class="card-body">
                     <h5 class="card-title" style="text-align: center">Edit Label</h5>
-                    <form>
+                    <form id="labelEditForm" action="/labelEdit.html/{{label_info[0]}}" method="post">
 
                         <div class="form-group col-md-6">
                             <label for="labelNameId">Label Name</label>
-                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="labelNameId"
-                                   placeholder="Name of Label">
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="labelNameId" name="labelNameEdit" 
+                                   value="{{label_info[1]}}">
                         </div>
 
                         <div class="form-group col-md-6">
                             <label for="streetAddressId">Address</label>
-                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="streetAddressId"
-                                   placeholder="Street Address">
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="streetAddressId" name="streetAddressEdit"
+                                   value="{{label_info[2]}}">
                         </div>
 
                         <div class="form-group col-md-6">
                             <label for="cityId">City</label>
-                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="cityId"
-                                   placeholder="City">
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="cityId" name="cityEdit"
+                                   value="{{label_info[3]}}">
                         </div>
 
                         <div class="form-group col-md-6">
                             <label for="stateId">State</label>
-                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="stateId"
-                                   placeholder="State">
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="stateId" name="stateEdit"
+                                   value="{{label_info[4]}}">
                         </div>
 
                         <div class="form-group col-md-6">
                             <label for="zipCodeId">Zip Code</label>
-                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="zipCodeId"
-                                   placeholder="Zip Code">
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="zipCodeId" name="zipCodeEdit"
+                                   value="{{label_info[5]}}">
                         </div>
 
                         <button type="submit" class="btn btn-primary" id="editLabelSubmitId">Edit Label</button>

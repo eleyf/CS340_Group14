@@ -20,7 +20,7 @@
 
         <div>
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <a class="navbar-brand" href="index.html">HOME</a>
+                <a class="navbar-brand" href="/index.html">HOME</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
                         aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -42,25 +42,23 @@
             <div class="card col-sm-6">
                 <div class="card-body">
                     <h5 class="card-title" style="text-align: center">Edit Song</h5>
-                    <form>
+                    <form id="songEditForm" action="/songEdit.html/{{song_info[0]}}" method="post">
 
                         <div class="form-group col-md-6">
                             <label for="songNameId">Song Name</label>
-                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="songNameId"
-                                   placeholder="Name of Song">
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="songNameId" name="songNameEdit" value="{{song_info[1]}}">
                         </div>
 
                         <div class="form-group col-md-6">
                             <label for="albumId">Album</label>
-                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="albumId"
-                                   placeholder="Name of Album">
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="albumId" name="albumEdit" value="{{song_info[2]}}">
                         </div>
 
-                        <div class="form-group col-md-6">
+<!--                         <div class="form-group col-md-6">
                             <label for="artistId">Artist</label>
                             <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="artistId"
                                    placeholder="Name of Artist">
-                        </div>
+                        </div> -->
 
                         <button type="submit" class="btn btn-primary" id="newSongSubmitId">Edit Song</button>
 

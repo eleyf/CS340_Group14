@@ -42,24 +42,21 @@
             <div class="card col-sm-6">
                 <div class="card-body">
                     <h5 class="card-title" style="text-align: center">Edit Album</h5>
-                    <form>
+                    <form id="albumEditForm" action="/albumEdit.html/{{album_info[0]}}" method="post">
 
                         <div class="form-group col-md-6">
                             <label for="albumNameId">Album Name</label>
-                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="albumNameId"
-                                   placeholder="Name of Album">
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="albumNameId" name="albumNameEdit" value="{{album_info[1]}}">
                         </div>
 
                         <div class="form-group col-md-6">
                             <label for="labelId">Label</label>
-                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="labelId"
-                                   placeholder="Name of Label">
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="labelId" name="labelEdit" value="{{album_info[2]}}">
                         </div>
 
                         <div class="form-group col-md-6">
                             <label for="releaseDateId">Release Date</label>
-                            <input type="date" class="form-control mb-2 mr-sm-2 mb-sm-0" id="releaseDateId"
-                                   placeholder="Release Date">
+                            <input type="date" class="form-control mb-2 mr-sm-2 mb-sm-0" id="releaseDateId" name="releaseDateEdit" value="{{album_info[3]}}">
                         </div>
 
                         <button type="submit" class="btn btn-primary" id="editAlbumSubmitId">Edit Album</button>
