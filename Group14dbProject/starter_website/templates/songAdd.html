@@ -10,6 +10,12 @@
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
     <title>Song Add</title>
+
+    <style>
+        #addArtistBtn {
+            margin-bottom: 1rem;
+        }
+    </style>
 </head>
 <body>
 
@@ -49,6 +55,7 @@
                     </ul>
                 </div>
                 {% endif %}
+
                 <div class="card-body">
                     <h5 class="card-title" style="text-align: center">Add A Song</h5>
                     <form action="/songAdd.html" method="POST">
@@ -56,19 +63,35 @@
                         <div class="form-group col-md-6">
                             <label for="songNameId">Song Name</label>
                             <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="songNameId"
-                                   placeholder="Name of Song" name="songName">
+                                    placeholder="Name of Song" name="songName" required>
                         </div>
+
+                        <div class="form-group col-md-6" id="artistContainer">
+                            <label for="artistId">Artist</label>
+                            {% if rows.artist_result %}
+                                <select class="form-control mb-2 mr-sm-2 mb-sm-0" id="artistId"
+                                        placeholder="Name of Artist" name="artistName" required>
+                                    {% for r in rows.artist_result %}
+                                        <option value="{{ r[0] }}">{{ r[0] }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
+                        </div>
+
+                        <button type="button" class="btn btn-secondary" id="addArtistBtn"
+                                onclick="addArtistInput()">Add another artist</button>
+                        <br>
 
                         <div class="form-group col-md-6">
                             <label for="albumId">Album</label>
-                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="albumId"
-                                   placeholder="Name of Album" name="albumName">
-                        </div>
-
-                        <div class="form-group col-md-6">
-                            <label for="artistId">Artist</label>
-                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="artistId"
-                                   placeholder="Name of Artist" name="artistName">
+                            {% if rows.album_result %}
+                                <select class="form-control mb-2 mr-sm-2 mb-sm-0" id="albumId"
+                                        placeholder="Name of Album" name="albumName" required>
+                                    {% for r in rows.album_result %}
+                                        <option value="{{ r[0] }}">{{ r[0] }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
                         </div>
 
                         <button type="submit" class="btn btn-primary" id="newSongSubmitId">Add Song</button>
@@ -92,5 +115,34 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
+
+<script>
+    var getId = (function() {
+        var count = 0;
+        return function() {
+            return ++count;
+        }
+    }());
+
+    function addArtistInput() {
+        var oldArtist = document.getElementById('artistContainer');
+        var newArtist = oldArtist.cloneNode(true);
+
+        var newId = getId();
+
+        newArtist.setAttribute('id', newArtist.id + newId);
+
+        var newLabel = newArtist.getElementsByTagName('label')[0];
+        newLabel.setAttribute('for', newLabel.getAttribute('for').toString() + newId);
+
+        var newSelect = newArtist.getElementsByTagName('select')[0];
+        newSelect.id = newSelect.id + newId;
+        newSelect.name = newSelect.name + newId;
+
+        var newArtistBtn = document.getElementById('addArtistBtn');
+        newArtistBtn.parentNode.insertBefore(newArtist, newArtistBtn);
+    }
+</script>
+
 </body>
 </html>

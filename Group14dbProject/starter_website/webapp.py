@@ -142,7 +142,7 @@ def songSearch():
                 ORDER BY song_name ASC"
         data = ("%" + songToSearchFor + "%",)
         result = execute_query(db_connection, query, data).fetchall();
-        print(result) 
+        print(result)
         return render_template('songSearch.html', rows=result)
 
 @webapp.route('/albumSearch.html', methods=['POST','GET'])
@@ -225,7 +225,21 @@ def labelSearch():
 @webapp.route('/songAdd.html', methods=['GET', 'POST'])
 def songAdd():
     if request.method == 'GET':
-        return render_template('songAdd.html')
+        db_connection = connect_to_database()
+
+        query = 'SELECT `album`.`name` FROM `album`'
+        album_result = execute_query(db_connection, query).fetchall()
+
+        query = 'SELECT `artist`.`name` FROM `artist`'
+        artist_result = execute_query(db_connection, query).fetchall()
+
+        result = {
+            'album_result': album_result,
+            'artist_result': artist_result
+        }
+
+        return render_template('songAdd.html', rows=result)
+
     elif request.method == 'POST':
         db_connection = connect_to_database()
         errors = []
@@ -245,13 +259,26 @@ def songAdd():
         except IndexError:
             errors.append('Invalid album')
 
-        # get the artist id given the artist name
-        data = (artist_name,)
-        query = 'SELECT `artist`.`id` FROM `artist` WHERE `artist`.`name` = %s;'
+
+
+        artist_keys = [s for s in request.form if 'artistName' in s]
+        artist_keys.pop()
+
+        # get the artist ids given the artist names
+        data = tuple([request.form[s] for s in request.form if 'artistName' in s])
+
+        query = 'SELECT `artist`.`id` FROM `artist` WHERE `artist`.`name` = %s'
+
+        for artist_key in artist_keys:
+            query += ' OR `artist`.`name` = %s'
+
         result = execute_query(db_connection, query, data).fetchall()
 
+        artist_ids = []
+
         try:
-            artist_id = result[0][0]
+            for data_pair in result:
+                artist_ids.append(data_pair[0])
         except IndexError:
             errors.append('Invalid artist')
 
@@ -264,20 +291,73 @@ def songAdd():
         data = (song_name, album_id)
         execute_query(db_connection, query, data)
 
-        query = ('INSERT INTO `song_artist` (`song_id`, `artist_id`) '
-                 'VALUES (LAST_INSERT_ID(), %s);')
-        data = (artist_id,)
-        execute_query(db_connection, query, data)
+        for artist_id in artist_ids:
+            query = ('INSERT INTO `song_artist` (`song_id`, `artist_id`) '
+                     'VALUES (LAST_INSERT_ID(), %s);')
+            data = (artist_id,)
+            execute_query(db_connection, query, data)
 
         # display search page
         query = 'SELECT `song`.`id`, `song`.`name` AS `song_name`, `album`.`name` AS `album_name`, `artist`.`name` AS `artist_name` FROM `song`JOIN `album` on `song`.`album_id` = `album`.`id`JOIN `song_artist` on `song`.`id` = `song_artist`.`song_id`JOIN `artist` ON `song_artist`.`artist_id` = `artist`.`id` ORDER BY song_name ASC;'
         result = execute_query(db_connection, query).fetchall();
         return render_template('songSearch.html', rows=result)
 
+<<<<<<< HEAD
+=======
+@webapp.route('/songEdit.html')
+def songEdit():
+    return render_template('songEdit.html')
+
+@webapp.route('/albumSearch.html', methods=['POST','GET'])
+
+def albumSearch():
+    if request.method == 'GET':
+        print("Fetching and rendering album web page")
+        db_connection = connect_to_database()
+        query = 'SELECT `album`.`id`, `album`.`name`, \
+                `record_label`.`name`, `album`.`release_date` \
+                FROM `album`\
+                JOIN `record_label` ON `album`.`label_id` = `record_label`.`id` \
+                ORDER BY `album`.`name` ASC;'
+        result = execute_query(db_connection, query).fetchall();
+        print(result)
+        return render_template('albumSearch.html', rows=result)
+
+    elif request.method == 'POST':
+        print("Fetching and rendering album web page post")
+        db_connection = connect_to_database()
+        albumToSearchFor = request.form['albumToSearchFor']
+        query = "SELECT `album`.`id`, `album`.`name`, \
+                `record_label`.`name`, `album`.`release_date` \
+                FROM `album`\
+                JOIN `record_label` ON `album`.`label_id` = `record_label`.`id` \
+                WHERE `album`.`name` LIKE %s \
+                ORDER BY `album`.`name` ASC;"
+        data = ("%" + albumToSearchFor + "%",)
+        result = execute_query(db_connection, query, data).fetchall();
+        print(result)
+        return render_template('albumSearch.html', rows=result)
+
+
+>>>>>>> 40a4118e709b3b4ff414af46ebbde333259c6f41
 @webapp.route('/albumAdd.html', methods=['GET', 'POST'])
 def albumAdd():
     if request.method == 'GET':
-        return render_template('albumAdd.html')
+
+        db_connection = connect_to_database()
+
+        query = 'SELECT `record_label`.`name` FROM `record_label`'
+        label_result = execute_query(db_connection, query).fetchall()
+
+        query = 'SELECT `artist`.`name` FROM `artist`'
+        artist_result = execute_query(db_connection, query).fetchall()
+
+        result = {
+            'label_result': label_result,
+            'artist_result': artist_result
+        }
+
+        return render_template('albumAdd.html', rows=result)
     elif request.method == 'POST':
         db_connection = connect_to_database()
         errors = []
@@ -291,6 +371,7 @@ def albumAdd():
         # get the label id given the label name
         data = (label_name,)
         query = 'SELECT `record_label`.`id` FROM `record_label` WHERE `record_label`.`name` = %s;'
+
         result = execute_query(db_connection, query, data).fetchall()
 
         try:
@@ -298,13 +379,24 @@ def albumAdd():
         except IndexError:
             errors.append('Invalid label')
 
-        # get the artist id given the artist name
-        data = (artist_name,)
-        query = 'SELECT `artist`.`id` FROM `artist` WHERE `artist`.`name` = %s;'
+        artist_keys = [s for s in request.form if 'artistName' in s]
+        artist_keys.pop()
+
+        # get the artist ids given the artist names
+        data = tuple([request.form[s] for s in request.form if 'artistName' in s])
+
+        query = 'SELECT `artist`.`id` FROM `artist` WHERE `artist`.`name` = %s'
+
+        for artist_key in artist_keys:
+            query += ' OR `artist`.`name` = %s'
+
         result = execute_query(db_connection, query, data).fetchall()
 
+        artist_ids = []
+
         try:
-            artist_id = result[0][0]
+            for data_pair in result:
+                artist_ids.append(data_pair[0])
         except IndexError:
             errors.append('Invalid artist')
 
@@ -318,16 +410,47 @@ def albumAdd():
         data = (album_name, label_id, release_date)
         result = execute_query(db_connection, query, data)
 
-        query = ('INSERT INTO `album_artist` (`album_id`, `artist_id`) '
-                 'VALUES (LAST_INSERT_ID(), %s);')
-        data = (artist_id,)
-        execute_query(db_connection, query, data)
+        for artist_id in artist_ids:
+            query = ('INSERT INTO `album_artist` (`album_id`, `artist_id`) '
+                     'VALUES (LAST_INSERT_ID(), %s);')
+            data = (artist_id,)
+            execute_query(db_connection, query, data)
 
         # display search page
         query = 'SELECT `album`.`id`, `album`.`name`, `record_label`.`name`, `album`.`release_date` FROM `album`JOIN `record_label` ON `album`.`label_id` = `record_label`.`id` ORDER BY `album`.`name` ASC;'
         result = execute_query(db_connection, query).fetchall()
         return render_template('albumSearch.html', rows=result)
 
+<<<<<<< HEAD
+=======
+@webapp.route('/albumEdit.html')
+def albumEdit():
+    return render_template('albumEdit.html')
+
+@webapp.route('/artistSearch.html', methods=['POST','GET'])
+def artistSearch():
+    if request.method == 'GET':
+        print("Fetching and rendering artist web page")
+        db_connection = connect_to_database()
+        query = 'SELECT * FROM `artist` ORDER BY name ASC;'
+        result = execute_query(db_connection, query).fetchall();
+        print(result)
+        return render_template('artistSearch.html', rows=result)
+
+    elif request.method == 'POST':
+        print("Fetching and rendering artist web page post")
+        db_connection = connect_to_database()
+        artistToSearchFor = request.form['artistToSearchFor']
+        query = "SELECT * FROM `artist` \
+                WHERE `artist`.`name` LIKE %s\
+                ORDER BY name ASC;"
+        data = ("%" + artistToSearchFor + "%",)
+        result = execute_query(db_connection, query, data).fetchall();
+        print(result)
+        return render_template('artistSearch.html', rows=result)
+
+
+>>>>>>> 40a4118e709b3b4ff414af46ebbde333259c6f41
 @webapp.route('/artistAdd.html', methods=['GET', 'POST'])
 def artistAdd():
     if request.method == 'GET':
@@ -349,6 +472,35 @@ def artistAdd():
         result = execute_query(db_connection, query).fetchall()
         return render_template('artistSearch.html', rows=result)
 
+<<<<<<< HEAD
+=======
+@webapp.route('/artistEdit.html')
+def artistEdit():
+    return render_template('artistEdit.html')
+
+@webapp.route('/labelSearch.html', methods=['POST','GET'])
+def labelSearch():
+    if request.method == 'GET':
+        print("Fetching and rendering label web page")
+        db_connection = connect_to_database()
+        query = 'SELECT * FROM `record_label` ORDER BY name ASC;'
+        result = execute_query(db_connection, query).fetchall();
+        print(result)
+        return render_template('labelSearch.html', rows=result)
+
+    elif request.method == 'POST':
+        print("Fetching and rendering label web page post")
+        db_connection = connect_to_database()
+        labelToSearchFor = request.form['labelToSearchFor']
+        query = "SELECT * FROM `record_label`\
+                WHERE `record_label`.`name` LIKE %s\
+                ORDER BY name ASC;"
+        data = ("%" + labelToSearchFor + "%",)
+        result = execute_query(db_connection, query, data).fetchall();
+        print(result)
+        return render_template('labelSearch.html', rows=result)
+
+>>>>>>> 40a4118e709b3b4ff414af46ebbde333259c6f41
 @webapp.route('/labelAdd.html', methods=['GET', 'POST'])
 def labelAdd():
     if request.method == 'GET':
