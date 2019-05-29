@@ -302,40 +302,6 @@ def songAdd():
         result = execute_query(db_connection, query).fetchall();
         return render_template('songSearch.html', rows=result)
 
-@webapp.route('/songEdit.html')
-def songEdit():
-    return render_template('songEdit.html')
-
-@webapp.route('/albumSearch.html', methods=['POST','GET'])
-
-def albumSearch():
-    if request.method == 'GET':
-        print("Fetching and rendering album web page")
-        db_connection = connect_to_database()
-        query = 'SELECT `album`.`id`, `album`.`name`, \
-                `record_label`.`name`, `album`.`release_date` \
-                FROM `album`\
-                JOIN `record_label` ON `album`.`label_id` = `record_label`.`id` \
-                ORDER BY `album`.`name` ASC;'
-        result = execute_query(db_connection, query).fetchall();
-        print(result)
-        return render_template('albumSearch.html', rows=result)
-
-    elif request.method == 'POST':
-        print("Fetching and rendering album web page post")
-        db_connection = connect_to_database()
-        albumToSearchFor = request.form['albumToSearchFor']
-        query = "SELECT `album`.`id`, `album`.`name`, \
-                `record_label`.`name`, `album`.`release_date` \
-                FROM `album`\
-                JOIN `record_label` ON `album`.`label_id` = `record_label`.`id` \
-                WHERE `album`.`name` LIKE %s \
-                ORDER BY `album`.`name` ASC;"
-        data = ("%" + albumToSearchFor + "%",)
-        result = execute_query(db_connection, query, data).fetchall();
-        print(result)
-        return render_template('albumSearch.html', rows=result)
-
 @webapp.route('/albumAdd.html', methods=['GET', 'POST'])
 def albumAdd():
     if request.method == 'GET':
@@ -417,32 +383,6 @@ def albumAdd():
         result = execute_query(db_connection, query).fetchall()
         return render_template('albumSearch.html', rows=result)
 
-@webapp.route('/albumEdit.html')
-def albumEdit():
-    return render_template('albumEdit.html')
-
-@webapp.route('/artistSearch.html', methods=['POST','GET'])
-def artistSearch():
-    if request.method == 'GET':
-        print("Fetching and rendering artist web page")
-        db_connection = connect_to_database()
-        query = 'SELECT * FROM `artist` ORDER BY name ASC;'
-        result = execute_query(db_connection, query).fetchall();
-        print(result)
-        return render_template('artistSearch.html', rows=result)
-
-    elif request.method == 'POST':
-        print("Fetching and rendering artist web page post")
-        db_connection = connect_to_database()
-        artistToSearchFor = request.form['artistToSearchFor']
-        query = "SELECT * FROM `artist` \
-                WHERE `artist`.`name` LIKE %s\
-                ORDER BY name ASC;"
-        data = ("%" + artistToSearchFor + "%",)
-        result = execute_query(db_connection, query, data).fetchall();
-        print(result)
-        return render_template('artistSearch.html', rows=result)
-
 @webapp.route('/artistAdd.html', methods=['GET', 'POST'])
 def artistAdd():
     if request.method == 'GET':
@@ -463,32 +403,6 @@ def artistAdd():
         query = 'SELECT * FROM `artist` ORDER BY name ASC;'
         result = execute_query(db_connection, query).fetchall()
         return render_template('artistSearch.html', rows=result)
-
-@webapp.route('/artistEdit.html')
-def artistEdit():
-    return render_template('artistEdit.html')
-
-@webapp.route('/labelSearch.html', methods=['POST','GET'])
-def labelSearch():
-    if request.method == 'GET':
-        print("Fetching and rendering label web page")
-        db_connection = connect_to_database()
-        query = 'SELECT * FROM `record_label` ORDER BY name ASC;'
-        result = execute_query(db_connection, query).fetchall();
-        print(result)
-        return render_template('labelSearch.html', rows=result)
-
-    elif request.method == 'POST':
-        print("Fetching and rendering label web page post")
-        db_connection = connect_to_database()
-        labelToSearchFor = request.form['labelToSearchFor']
-        query = "SELECT * FROM `record_label`\
-                WHERE `record_label`.`name` LIKE %s\
-                ORDER BY name ASC;"
-        data = ("%" + labelToSearchFor + "%",)
-        result = execute_query(db_connection, query, data).fetchall();
-        print(result)
-        return render_template('labelSearch.html', rows=result)
 
 @webapp.route('/labelAdd.html', methods=['GET', 'POST'])
 def labelAdd():
