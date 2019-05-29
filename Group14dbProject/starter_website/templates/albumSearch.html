@@ -81,9 +81,9 @@
                     <td> {{ r[3] }}</td>        
                     <td> 
                         <input type='button' name='Edit' value='EDIT' class="btn btn-info" style="margin-right: 15px"
-                        onclick="window.location = '/albumEdit.html'">
+                        onclick="window.location = '/albumEdit.html/{{r[0]}}'">
 
-                        <input type='button' name='Delete' value='DELETE' class="btn btn-danger">
+                        <input type='button' name='Delete' value='DELETE' class="btn btn-danger" onclick="window.location = '/albumDelete/{{r[0]}}'">
                     </td>
                   </tr>
                   {% endfor %}

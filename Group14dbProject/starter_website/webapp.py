@@ -107,6 +107,10 @@ def index():
 def home():
     return render_template('index.html')
 
+# *********************************
+# search webapps
+# *********************************
+
 @webapp.route('/songSearch.html', methods=['POST','GET'])
 def songSearch():
     if request.method == 'GET':
@@ -141,6 +145,82 @@ def songSearch():
         print(result)
         return render_template('songSearch.html', rows=result)
 
+@webapp.route('/albumSearch.html', methods=['POST','GET'])
+def albumSearch():
+    if request.method == 'GET':
+        print("Fetching and rendering album web page")
+        db_connection = connect_to_database()
+        query = 'SELECT `album`.`id`, `album`.`name`, \
+                `record_label`.`name`, `album`.`release_date` \
+                FROM `album`\
+                JOIN `record_label` ON `album`.`label_id` = `record_label`.`id` \
+                ORDER BY `album`.`name` ASC;'
+        result = execute_query(db_connection, query).fetchall();
+        print(result)
+        return render_template('albumSearch.html', rows=result)
+
+    elif request.method == 'POST':
+        print("Fetching and rendering album web page post")
+        db_connection = connect_to_database()
+        albumToSearchFor = request.form['albumToSearchFor']
+        query = "SELECT `album`.`id`, `album`.`name`, \
+                `record_label`.`name`, `album`.`release_date` \
+                FROM `album`\
+                JOIN `record_label` ON `album`.`label_id` = `record_label`.`id` \
+                WHERE `album`.`name` LIKE %s \
+                ORDER BY `album`.`name` ASC;"
+        data = ("%" + albumToSearchFor + "%",)
+        result = execute_query(db_connection, query, data).fetchall();
+        print(result)
+        return render_template('albumSearch.html', rows=result)
+
+@webapp.route('/artistSearch.html', methods=['POST','GET'])
+def artistSearch():
+    if request.method == 'GET':
+        print("Fetching and rendering artist web page")
+        db_connection = connect_to_database()
+        query = 'SELECT * FROM `artist` ORDER BY name ASC;'
+        result = execute_query(db_connection, query).fetchall();
+        print(result)
+        return render_template('artistSearch.html', rows=result)
+
+    elif request.method == 'POST':
+        print("Fetching and rendering artist web page post")
+        db_connection = connect_to_database()
+        artistToSearchFor = request.form['artistToSearchFor']
+        query = "SELECT * FROM `artist` \
+                WHERE `artist`.`name` LIKE %s\
+                ORDER BY name ASC;"
+        data = ("%" + artistToSearchFor + "%",)
+        result = execute_query(db_connection, query, data).fetchall();
+        print(result)
+        return render_template('artistSearch.html', rows=result)
+
+@webapp.route('/labelSearch.html', methods=['POST','GET'])
+def labelSearch():
+    if request.method == 'GET':
+        print("Fetching and rendering label web page")
+        db_connection = connect_to_database()
+        query = 'SELECT * FROM `record_label` ORDER BY name ASC;'
+        result = execute_query(db_connection, query).fetchall();
+        print(result)
+        return render_template('labelSearch.html', rows=result)
+
+    elif request.method == 'POST':
+        print("Fetching and rendering label web page post")
+        db_connection = connect_to_database()
+        labelToSearchFor = request.form['labelToSearchFor']
+        query = "SELECT * FROM `record_label`\
+                WHERE `record_label`.`name` LIKE %s\
+                ORDER BY name ASC;"
+        data = ("%" + labelToSearchFor + "%",)
+        result = execute_query(db_connection, query, data).fetchall();
+        print(result)
+        return render_template('labelSearch.html', rows=result)
+
+# *********************************
+# add webapps
+# *********************************
 
 @webapp.route('/songAdd.html', methods=['GET', 'POST'])
 def songAdd():
@@ -256,7 +336,6 @@ def albumSearch():
         print(result)
         return render_template('albumSearch.html', rows=result)
 
-
 @webapp.route('/albumAdd.html', methods=['GET', 'POST'])
 def albumAdd():
     if request.method == 'GET':
@@ -364,7 +443,6 @@ def artistSearch():
         print(result)
         return render_template('artistSearch.html', rows=result)
 
-
 @webapp.route('/artistAdd.html', methods=['GET', 'POST'])
 def artistAdd():
     if request.method == 'GET':
@@ -438,6 +516,185 @@ def labelAdd():
         result = execute_query(db_connection, query).fetchall()
         return render_template('labelSearch.html', rows=result)
 
-@webapp.route('/labelEdit.html')
-def labelEdit():
-    return render_template('labelEdit.html')
+# *********************************
+# edit webapps
+# *********************************
+
+@webapp.route('/songEdit.html/<int:id>', methods=['POST','GET'])
+def songEdit(id):
+    if request.method == 'GET':
+        db_connection = connect_to_database()
+        song_query = "SELECT `song`.`id`, `song`.`name` AS `song_name`, \
+                `album`.`name` AS `album_name`, \
+                `artist`.`name` AS `artist_name` \
+                FROM `song`\
+                JOIN `album` on `song`.`album_id` = `album`.`id`\
+                JOIN `song_artist` on `song`.`id` = `song_artist`.`song_id`\
+                JOIN `artist` ON `song_artist`.`artist_id` = `artist`.`id`\
+                WHERE `song`.`id` = %s"
+        data = (id,)
+        song_result = execute_query(db_connection, song_query, data).fetchone();
+        print(song_result)
+        return render_template('songEdit.html', song_info = song_result)
+    elif request.method == 'POST':
+        print("Update song!");
+        # get data from form
+        songNameEdit = request.form['songNameEdit']
+        albumEdit = request.form['albumEdit']
+
+        # connect to database and update
+        db_connection = connect_to_database()
+
+        query = "UPDATE `song`\
+                SET `song`.`name` = %s,\
+                `song`.`album_id` = (SELECT `album`.`id` FROM `album` WHERE `album`.`name` = %s)\
+                WHERE `song`.`id` = %s"
+        data = (songNameEdit, albumEdit, id)
+        result = execute_query(db_connection, query, data)
+
+
+        return redirect('/songSearch.html')
+
+
+@webapp.route('/albumEdit.html/<int:id>', methods=['POST','GET'])
+def albumEdit(id):
+    if request.method == 'GET':
+        db_connection = connect_to_database()
+        album_query = "SELECT `album`.`id`, `album`.`name`, \
+                `record_label`.`name`, `album`.`release_date` \
+                FROM `album`\
+                JOIN `record_label` ON `album`.`label_id` = `record_label`.`id` \
+                WHERE `album`.`id` = %s"
+        data = (id,)
+        album_result = execute_query(db_connection, album_query, data).fetchone();
+        print(album_result)
+        return render_template('albumEdit.html', album_info = album_result)
+    elif request.method == 'POST':
+        print("Update album!");
+        # get data from form
+        albumNameEdit = request.form['albumNameEdit']
+        labelEdit = request.form['labelEdit']
+        releaseDateEdit = request.form['releaseDateEdit']
+
+        # connect to database and update
+        db_connection = connect_to_database()
+
+        query = "UPDATE `album`\
+                SET `album`.`name` = %s,\
+                `album`.`label_id` = (SELECT `record_label`.`id` FROM `record_label` WHERE `record_label`.`name` = %s), `album`.`release_date` = %s\
+                WHERE `album`.`id` = %s"
+        data = (albumNameEdit, labelEdit, releaseDateEdit, id)
+        result = execute_query(db_connection, query, data)
+
+
+        return redirect('/albumSearch.html')
+
+
+@webapp.route('/artistEdit.html/<int:id>', methods=['POST','GET'])
+def artistEdit(id):
+    if request.method == 'GET':
+        db_connection = connect_to_database()
+        artist_query = "SELECT * FROM `artist`\
+                WHERE `id` = %s"
+        data = (id,)
+        artist_result = execute_query(db_connection, artist_query, data).fetchone();
+        print(artist_result)
+        return render_template('artistEdit.html', artist_info = artist_result)
+    elif request.method == 'POST':
+        print("Update artist!");
+        # get data from form
+        artistNameEdit = request.form['artistNameEdit']
+
+        # connect to database and update
+        db_connection = connect_to_database()
+        query = "UPDATE `artist`\
+                SET `name` = %s\
+                WHERE `id` = %s"
+        data = (artistNameEdit, id)
+        result = execute_query(db_connection, query, data)
+
+
+        return redirect('/artistSearch.html')
+
+@webapp.route('/labelEdit.html/<int:id>', methods=['POST','GET'])
+def labelEdit(id):
+    if request.method == 'GET':
+        db_connection = connect_to_database()
+        label_query = "SELECT * FROM `record_label`\
+                WHERE `id` = %s"
+        data = (id,)
+        label_result = execute_query(db_connection, label_query, data).fetchone();
+        print(label_result)
+        return render_template('labelEdit.html', label_info = label_result)
+    elif request.method == 'POST':
+        print("Update label!");
+        # get data from form
+        labelNameEdit = request.form['labelNameEdit']
+        streetAddressEdit = request.form['streetAddressEdit']
+        cityEdit = request.form['cityEdit']
+        stateEdit = request.form['stateEdit']
+        zipCodeEdit = request.form['zipCodeEdit']
+
+        # connect to database and update
+        db_connection = connect_to_database()
+        query = "UPDATE `record_label`\
+                SET `name` = %s, `street_address` = %s, `city` = %s, `state` = %s, `zip_code` = %s\
+                WHERE `id` = %s"
+        data = (labelNameEdit, streetAddressEdit, cityEdit, stateEdit, zipCodeEdit, id)
+        result = execute_query(db_connection, query, data)
+
+
+        return redirect('/labelSearch.html')
+
+
+# *********************************
+# delete webapps
+# *********************************
+
+@webapp.route('/songDelete/<int:id>')
+def songDelete(id):
+    '''deletes a label with the given id'''
+    # db_connection = connect_to_database()
+    # query = "DELETE FROM bsg_people WHERE character_id = %s"
+    # data = (id,)
+
+
+    # result = execute_query(db_connection, query, data)
+    # return (str(result.rowcount) + "row deleted")
+    return "Delete song with given id "
+
+@webapp.route('/albumDelete/<int:id>')
+def albumDelete(id):
+    '''deletes a label with the given id'''
+    # db_connection = connect_to_database()
+    # query = "DELETE FROM bsg_people WHERE character_id = %s"
+    # data = (id,)
+
+
+    # result = execute_query(db_connection, query, data)
+    # return (str(result.rowcount) + "row deleted")
+    return "Delete album with given id "
+
+@webapp.route('/artistDelete/<int:id>')
+def artistDelete(id):
+    '''deletes a label with the given id'''
+    # db_connection = connect_to_database()
+    # query = "DELETE FROM bsg_people WHERE character_id = %s"
+    # data = (id,)
+
+
+    # result = execute_query(db_connection, query, data)
+    # return (str(result.rowcount) + "row deleted")
+    return "Delete artist with given id "
+
+@webapp.route('/labelDelete/<int:id>')
+def labelDelete(id):
+    '''deletes a label with the given id'''
+    # db_connection = connect_to_database()
+    # query = "DELETE FROM bsg_people WHERE character_id = %s"
+    # data = (id,)
+
+
+    # result = execute_query(db_connection, query, data)
+    # return (str(result.rowcount) + "row deleted")
+    return "Delete label with given id "

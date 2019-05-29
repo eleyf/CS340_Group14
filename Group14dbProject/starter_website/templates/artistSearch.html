@@ -79,9 +79,9 @@
 
                     <td> 
                         <input type='button' name='Edit' value='EDIT' class="btn btn-info" style="margin-right: 15px"
-                        onclick="window.location = '/artistEdit.html'">
+                        onclick="window.location = '/artistEdit.html/{{r[0]}}'">
 
-                        <input type='button' name='Delete' value='DELETE' class="btn btn-danger">
+                        <input type='button' name='Delete' value='DELETE' class="btn btn-danger" onclick="window.location = '/artistDelete/{{r[0]}}'">
                     </td>
                   </tr>
                   {% endfor %}
