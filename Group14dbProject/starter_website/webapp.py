@@ -142,7 +142,7 @@ def songSearch():
                 ORDER BY song_name ASC"
         data = ("%" + songToSearchFor + "%",)
         result = execute_query(db_connection, query, data).fetchall();
-        print(result) 
+        print(result)
         return render_template('songSearch.html', rows=result)
 
 @webapp.route('/albumSearch.html', methods=['POST','GET'])
@@ -171,7 +171,7 @@ def albumSearch():
                 ORDER BY `album`.`name` ASC;"
         data = ("%" + albumToSearchFor + "%",)
         result = execute_query(db_connection, query, data).fetchall();
-        print(result) 
+        print(result)
         return render_template('albumSearch.html', rows=result)
 
 @webapp.route('/artistSearch.html', methods=['POST','GET'])
@@ -183,7 +183,7 @@ def artistSearch():
         result = execute_query(db_connection, query).fetchall();
         print(result)
         return render_template('artistSearch.html', rows=result)
-    
+
     elif request.method == 'POST':
         print("Fetching and rendering artist web page post")
         db_connection = connect_to_database()
@@ -193,7 +193,7 @@ def artistSearch():
                 ORDER BY name ASC;"
         data = ("%" + artistToSearchFor + "%",)
         result = execute_query(db_connection, query, data).fetchall();
-        print(result) 
+        print(result)
         return render_template('artistSearch.html', rows=result)
 
 @webapp.route('/labelSearch.html', methods=['POST','GET'])
@@ -215,7 +215,7 @@ def labelSearch():
                 ORDER BY name ASC;"
         data = ("%" + labelToSearchFor + "%",)
         result = execute_query(db_connection, query, data).fetchall();
-        print(result) 
+        print(result)
         return render_template('labelSearch.html', rows=result)
 
 # *********************************
@@ -225,7 +225,21 @@ def labelSearch():
 @webapp.route('/songAdd.html', methods=['GET', 'POST'])
 def songAdd():
     if request.method == 'GET':
-        return render_template('songAdd.html')
+        db_connection = connect_to_database()
+
+        query = 'SELECT `album`.`name` FROM `album`'
+        album_result = execute_query(db_connection, query).fetchall()
+
+        query = 'SELECT `artist`.`name` FROM `artist`'
+        artist_result = execute_query(db_connection, query).fetchall()
+
+        result = {
+            'album_result': album_result,
+            'artist_result': artist_result
+        }
+
+        return render_template('songAdd.html', rows=result)
+
     elif request.method == 'POST':
         db_connection = connect_to_database()
         errors = []
@@ -245,13 +259,26 @@ def songAdd():
         except IndexError:
             errors.append('Invalid album')
 
-        # get the artist id given the artist name
-        data = (artist_name,)
-        query = 'SELECT `artist`.`id` FROM `artist` WHERE `artist`.`name` = %s;'
+
+
+        artist_keys = [s for s in request.form if 'artistName' in s]
+        artist_keys.pop()
+
+        # get the artist ids given the artist names
+        data = tuple([request.form[s] for s in request.form if 'artistName' in s])
+
+        query = 'SELECT `artist`.`id` FROM `artist` WHERE `artist`.`name` = %s'
+
+        for artist_key in artist_keys:
+            query += ' OR `artist`.`name` = %s'
+
         result = execute_query(db_connection, query, data).fetchall()
 
+        artist_ids = []
+
         try:
-            artist_id = result[0][0]
+            for data_pair in result:
+                artist_ids.append(data_pair[0])
         except IndexError:
             errors.append('Invalid artist')
 
@@ -264,10 +291,11 @@ def songAdd():
         data = (song_name, album_id)
         execute_query(db_connection, query, data)
 
-        query = ('INSERT INTO `song_artist` (`song_id`, `artist_id`) '
-                 'VALUES (LAST_INSERT_ID(), %s);')
-        data = (artist_id,)
-        execute_query(db_connection, query, data)
+        for artist_id in artist_ids:
+            query = ('INSERT INTO `song_artist` (`song_id`, `artist_id`) '
+                     'VALUES (LAST_INSERT_ID(), %s);')
+            data = (artist_id,)
+            execute_query(db_connection, query, data)
 
         # display search page
         query = 'SELECT `song`.`id`, `song`.`name` AS `song_name`, `album`.`name` AS `album_name`, `artist`.`name` AS `artist_name` FROM `song`JOIN `album` on `song`.`album_id` = `album`.`id`JOIN `song_artist` on `song`.`id` = `song_artist`.`song_id`JOIN `artist` ON `song_artist`.`artist_id` = `artist`.`id` ORDER BY song_name ASC;'
@@ -277,7 +305,21 @@ def songAdd():
 @webapp.route('/albumAdd.html', methods=['GET', 'POST'])
 def albumAdd():
     if request.method == 'GET':
-        return render_template('albumAdd.html')
+
+        db_connection = connect_to_database()
+
+        query = 'SELECT `record_label`.`name` FROM `record_label`'
+        label_result = execute_query(db_connection, query).fetchall()
+
+        query = 'SELECT `artist`.`name` FROM `artist`'
+        artist_result = execute_query(db_connection, query).fetchall()
+
+        result = {
+            'label_result': label_result,
+            'artist_result': artist_result
+        }
+
+        return render_template('albumAdd.html', rows=result)
     elif request.method == 'POST':
         db_connection = connect_to_database()
         errors = []
@@ -291,6 +333,7 @@ def albumAdd():
         # get the label id given the label name
         data = (label_name,)
         query = 'SELECT `record_label`.`id` FROM `record_label` WHERE `record_label`.`name` = %s;'
+
         result = execute_query(db_connection, query, data).fetchall()
 
         try:
@@ -298,13 +341,24 @@ def albumAdd():
         except IndexError:
             errors.append('Invalid label')
 
-        # get the artist id given the artist name
-        data = (artist_name,)
-        query = 'SELECT `artist`.`id` FROM `artist` WHERE `artist`.`name` = %s;'
+        artist_keys = [s for s in request.form if 'artistName' in s]
+        artist_keys.pop()
+
+        # get the artist ids given the artist names
+        data = tuple([request.form[s] for s in request.form if 'artistName' in s])
+
+        query = 'SELECT `artist`.`id` FROM `artist` WHERE `artist`.`name` = %s'
+
+        for artist_key in artist_keys:
+            query += ' OR `artist`.`name` = %s'
+
         result = execute_query(db_connection, query, data).fetchall()
 
+        artist_ids = []
+
         try:
-            artist_id = result[0][0]
+            for data_pair in result:
+                artist_ids.append(data_pair[0])
         except IndexError:
             errors.append('Invalid artist')
 
@@ -318,10 +372,11 @@ def albumAdd():
         data = (album_name, label_id, release_date)
         result = execute_query(db_connection, query, data)
 
-        query = ('INSERT INTO `album_artist` (`album_id`, `artist_id`) '
-                 'VALUES (LAST_INSERT_ID(), %s);')
-        data = (artist_id,)
-        execute_query(db_connection, query, data)
+        for artist_id in artist_ids:
+            query = ('INSERT INTO `album_artist` (`album_id`, `artist_id`) '
+                     'VALUES (LAST_INSERT_ID(), %s);')
+            data = (artist_id,)
+            execute_query(db_connection, query, data)
 
         # display search page
         query = 'SELECT `album`.`id`, `album`.`name`, `record_label`.`name`, `album`.`release_date` FROM `album`JOIN `record_label` ON `album`.`label_id` = `record_label`.`id` ORDER BY `album`.`name` ASC;'
@@ -393,7 +448,7 @@ def songEdit(id):
                 WHERE `song`.`id` = %s"
         data = (id,)
         song_result = execute_query(db_connection, song_query, data).fetchone();
-        print(song_result) 
+        print(song_result)
         return render_template('songEdit.html', song_info = song_result)
     elif request.method == 'POST':
         print("Update song!");
@@ -426,7 +481,7 @@ def albumEdit(id):
                 WHERE `album`.`id` = %s"
         data = (id,)
         album_result = execute_query(db_connection, album_query, data).fetchone();
-        print(album_result) 
+        print(album_result)
         return render_template('albumEdit.html', album_info = album_result)
     elif request.method == 'POST':
         print("Update album!");
@@ -457,7 +512,7 @@ def artistEdit(id):
                 WHERE `id` = %s"
         data = (id,)
         artist_result = execute_query(db_connection, artist_query, data).fetchone();
-        print(artist_result) 
+        print(artist_result)
         return render_template('artistEdit.html', artist_info = artist_result)
     elif request.method == 'POST':
         print("Update artist!");
@@ -483,7 +538,7 @@ def labelEdit(id):
                 WHERE `id` = %s"
         data = (id,)
         label_result = execute_query(db_connection, label_query, data).fetchone();
-        print(label_result) 
+        print(label_result)
         return render_template('labelEdit.html', label_info = label_result)
     elif request.method == 'POST':
         print("Update label!");
