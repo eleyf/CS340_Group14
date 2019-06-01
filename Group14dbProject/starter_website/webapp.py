@@ -439,8 +439,8 @@ def songEdit(id):
     if request.method == 'GET':
         db_connection = connect_to_database()
         song_query = "SELECT `song`.`id`, `song`.`name` AS `song_name`, \
-                `album`.`name` AS `album_name`, \
-                `artist`.`name` AS `artist_name` \
+                `album`.`id` AS `album_id`, \
+                `album`.`name` AS `album_name` \
                 FROM `song`\
                 JOIN `album` on `song`.`album_id` = `album`.`id`\
                 JOIN `song_artist` on `song`.`id` = `song_artist`.`song_id`\
@@ -449,7 +449,12 @@ def songEdit(id):
         data = (id,)
         song_result = execute_query(db_connection, song_query, data).fetchone();
         print(song_result)
-        return render_template('songEdit.html', song_info = song_result)
+
+        album_query = 'SELECT `id`, `name` from `album` ORDER BY `name` ASC'
+        album_results = execute_query(db_connection, album_query).fetchall();
+        print(album_results)
+
+        return render_template('songEdit.html', song_info = song_result, album_info = album_results)
     elif request.method == 'POST':
         print("Update song!");
         # get data from form
@@ -475,14 +480,19 @@ def albumEdit(id):
     if request.method == 'GET':
         db_connection = connect_to_database()
         album_query = "SELECT `album`.`id`, `album`.`name`, \
-                `record_label`.`name`, `album`.`release_date` \
+                `record_label`.`id`, `album`.`release_date` \
                 FROM `album`\
                 JOIN `record_label` ON `album`.`label_id` = `record_label`.`id` \
                 WHERE `album`.`id` = %s"
         data = (id,)
         album_result = execute_query(db_connection, album_query, data).fetchone();
         print(album_result)
-        return render_template('albumEdit.html', album_info = album_result)
+
+        label_query = 'SELECT `id`, `name` from `record_label` ORDER BY `name` ASC'
+        label_results = execute_query(db_connection, label_query).fetchall();
+        print(label_results)
+
+        return render_template('albumEdit.html', album_info = album_result, label_info = label_results)
     elif request.method == 'POST':
         print("Update album!");
         # get data from form

@@ -20,17 +20,17 @@
 
         <div>
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <a class="navbar-brand" href="index.html">HOME</a>
+                <a class="navbar-brand" href="../index.html">HOME</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
                         aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav">
-                        <a class="nav-item nav-link" href="songSearch.html">Song</a>
-                        <a class="nav-item nav-link" href="albumSearch.html">Album</a>
-                        <a class="nav-item nav-link" href="artistSearch.html">Artist</a>
-                        <a class="nav-item nav-link" href="labelSearch.html">Label</a>
+                        <a class="nav-item nav-link" href="../songSearch.html">Song</a>
+                        <a class="nav-item nav-link" href="../albumSearch.html">Album</a>
+                        <a class="nav-item nav-link" href="../artistSearch.html">Artist</a>
+                        <a class="nav-item nav-link" href="../labelSearch.html">Label</a>
                     </div>
                 </div>
             </nav>
@@ -46,17 +46,27 @@
 
                         <div class="form-group col-md-6">
                             <label for="albumNameId">Album Name</label>
-                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="albumNameId" name="albumNameEdit" value="{{album_info[1]}}">
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="albumNameId" name="albumNameEdit" value="{{album_info[1]}}" required>
                         </div>
 
                         <div class="form-group col-md-6">
                             <label for="labelId">Label</label>
-                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="labelId" name="labelEdit" value="{{album_info[2]}}">
+                            <select class="form-control mb-2 mr-sm-2 mb-sm-0" id="labelId"
+                                    placeholder="Name of Label" name="labelEdit" required>
+
+                                {% for r in label_info %}
+                                    {% if r[0] == album_info[2] %}
+                                        <option selected value="{{ r[1] }}">{{ r[1] }}</option>
+                                    {% else %}
+                                        <option value="{{ r[1] }}">{{ r[1] }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
                         </div>
 
                         <div class="form-group col-md-6">
                             <label for="releaseDateId">Release Date</label>
-                            <input type="date" class="form-control mb-2 mr-sm-2 mb-sm-0" id="releaseDateId" name="releaseDateEdit" value="{{album_info[3]}}">
+                            <input type="date" class="form-control mb-2 mr-sm-2 mb-sm-0" id="releaseDateId" name="releaseDateEdit" value="{{album_info[3]}}" required>
                         </div>
 
                         <button type="submit" class="btn btn-primary" id="editAlbumSubmitId">Edit Album</button>
