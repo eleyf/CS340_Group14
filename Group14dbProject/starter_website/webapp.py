@@ -160,9 +160,7 @@ def songSearch():
                 ORDER BY song_name ASC"
         data = ("%" + songToSearchFor + "%",)
         result = execute_query(db_connection, query, data).fetchall();
-        #print(result)
-
-        print('\n\n')
+        print(result)
 
         result = list(result)
 
@@ -181,13 +179,8 @@ def songSearch():
 
             result[tail:lead] = [condensed]
 
-        print(result)
-
         result.sort(key = lambda x: x[1])
-        print('\n\nsorted tue\n\n')
-
-        print('\n\n')
-
+        
         return render_template('songSearch.html', rows=result)
 
 @webapp.route('/albumSearch.html', methods=['POST','GET'])
