@@ -123,9 +123,27 @@ def songSearch():
                 JOIN `album` on `song`.`album_id` = `album`.`id`\
                 JOIN `song_artist` on `song`.`id` = `song_artist`.`song_id`\
                 JOIN `artist` ON `song_artist`.`artist_id` = `artist`.`id`\
-                ORDER BY song_name ASC;'
+                ORDER BY song_id ASC;'
         result = execute_query(db_connection, query).fetchall();
         print(result)
+
+        result = list(result)
+        lead = 1;
+        tail = 0;
+        if len(result) > 1:
+            while lead < len(result) and result[lead][0] == result[tail][0]:
+                lead += 1
+            # tail is at the start of the range to condense
+            # lead is at the end of the range to condense (exclusive)
+            condensed = list(result[tail])
+            condensed[3] = [condensed[3]]
+
+            for i in range(tail + 1, lead):
+                condensed[3].append(result[i][3])
+
+            result[tail:lead] = [condensed]
+
+        result.sort(key = lambda x: x[1])
         return render_template('songSearch.html', rows=result)
     elif request.method == 'POST':
         print("Fetching and rendering song web page post")
@@ -143,6 +161,26 @@ def songSearch():
         data = ("%" + songToSearchFor + "%",)
         result = execute_query(db_connection, query, data).fetchall();
         print(result)
+
+        result = list(result)
+
+        lead = 1;
+        tail = 0;
+        if len(result) > 1:
+            while lead < len(result) and result[lead][0] == result[tail][0]:
+                lead += 1
+            # tail is at the start of the range to condense
+            # lead is at the end of the range to condense (exclusive)
+            condensed = list(result[tail])
+            condensed[3] = [condensed[3]]
+
+            for i in range(tail + 1, lead):
+                condensed[3].append(result[i][3])
+
+            result[tail:lead] = [condensed]
+
+        result.sort(key = lambda x: x[1])
+        
         return render_template('songSearch.html', rows=result)
 
 @webapp.route('/albumSearch.html', methods=['POST','GET'])
@@ -577,48 +615,33 @@ def labelEdit(id):
 
 @webapp.route('/songDelete/<int:id>')
 def songDelete(id):
-    '''deletes a label with the given id'''
-    # db_connection = connect_to_database()
-    # query = "DELETE FROM bsg_people WHERE character_id = %s"
-    # data = (id,)
+    db_connection = connect_to_database()
+    query = "DELETE FROM `song` WHERE `id` = %s"
+    data = (id,)
+    result = execute_query(db_connection, query, data)
+    return redirect('/songSearch.html')
 
-
-    # result = execute_query(db_connection, query, data)
-    # return (str(result.rowcount) + "row deleted")
-    return "Delete song with given id "
 
 @webapp.route('/albumDelete/<int:id>')
 def albumDelete(id):
-    '''deletes a label with the given id'''
-    # db_connection = connect_to_database()
-    # query = "DELETE FROM bsg_people WHERE character_id = %s"
-    # data = (id,)
-
-
-    # result = execute_query(db_connection, query, data)
-    # return (str(result.rowcount) + "row deleted")
-    return "Delete album with given id "
+    db_connection = connect_to_database()
+    query = "DELETE FROM `album` WHERE `id` = %s"
+    data = (id,)
+    result = execute_query(db_connection, query, data)
+    return redirect('/albumSearch.html')
 
 @webapp.route('/artistDelete/<int:id>')
 def artistDelete(id):
-    '''deletes a label with the given id'''
-    # db_connection = connect_to_database()
-    # query = "DELETE FROM bsg_people WHERE character_id = %s"
-    # data = (id,)
-
-
-    # result = execute_query(db_connection, query, data)
-    # return (str(result.rowcount) + "row deleted")
-    return "Delete artist with given id "
+    db_connection = connect_to_database()
+    query = "DELETE FROM `artist` WHERE `id` = %s"
+    data = (id,)
+    result = execute_query(db_connection, query, data)
+    return redirect('/artistSearch.html')
 
 @webapp.route('/labelDelete/<int:id>')
 def labelDelete(id):
-    '''deletes a label with the given id'''
-    # db_connection = connect_to_database()
-    # query = "DELETE FROM bsg_people WHERE character_id = %s"
-    # data = (id,)
-
-
-    # result = execute_query(db_connection, query, data)
-    # return (str(result.rowcount) + "row deleted")
-    return "Delete label with given id "
+    db_connection = connect_to_database()
+    query = "DELETE FROM `record_label` WHERE `id` = %s"
+    data = (id,)
+    result = execute_query(db_connection, query, data)
+    return redirect('/labelSearch.html')

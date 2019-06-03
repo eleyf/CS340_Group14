@@ -81,8 +81,16 @@
                     <td hidden> {{ r[0] }}</td>
                     <td> {{ r[1] }}</td>
                     <td> {{ r[2] }}</td>
-                    <td> {{ r[3] }}</td>       
-                    <td> 
+                    <td>
+                        {% if r[3] is not string %}
+                            {% for a in r[3] %}
+                            {{ a }}<br>
+                            {% endfor %}
+                        {% else %}
+                            {{ r[3] }}
+                        {% endif %}
+                    </td>
+                    <td>
                         <input type='button' name='Edit' value='EDIT' class="btn btn-info" style="margin-right: 15px"
                         onclick="window.location = '/songEdit.html/{{r[0]}}'">
 
